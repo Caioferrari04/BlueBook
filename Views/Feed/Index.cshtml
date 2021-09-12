@@ -1,0 +1,250 @@
+﻿@using Microsoft.AspNetCore.Identity
+@model List<IdentityUser>
+@{
+    ViewData["Title"] = "Seu Feed";
+    var mensagens = ViewBag.Mensagens as List<Mensagem>;
+    var nomeUsuario = ViewBag.NomeUsuarioLogado as string;
+    var linkImagemUsuario = ViewBag.LinkImagem as string;
+    var Postagens = ViewBag.Postagens as List<Postagem>;
+    var amigos = ViewBag.Amigos as List<Usuario>;
+    var linkPerfil = $"/User/Index/{ViewBag.linkPerfil}" as string;
+}
+
+@{
+    #region Feed / Posts
+    <div class="container">
+        <main role="main" class="pb-3">
+            <div class="barra-lateral">
+                <a href="pagina do usuario" class="btn btn-light">
+                    <img src="@linkImagemUsuario" class="usuario-imagem" />@nomeUsuario
+                </a>
+            </div>
+            <div id="feed">
+                @if (Postagens != null)
+                {
+                    @foreach (Postagem postagem in Postagens)
+                    {
+                        <div class="post">
+                            <img src="@linkImagemUsuario" class="usuario-imagem" />
+                            <a href="@postagem.UsuarioIdPost">@nomeUsuario</a>
+                            <p>@postagem.Texto</p>
+                            @if (postagem.UrlImagem != null)
+                            {
+                                <img src="@postagem.UrlImagem" />
+                            }
+                            <button class="btn btn-danger">Like</button>
+                            <button class="btn btn-secondary">Comentar</button>
+                        </div>
+                    }
+                }
+            </div>
+        </main>
+    </div>
+    #endregion
+}
+@{
+    #region Chat geral
+
+    <!-- Configurações CSS estão em wwwroot/css/site.css -->
+    <div class="container-chat" id="container-chat">
+        <div class="chat-title title" id="title">
+            Chat global
+            <button type="submit" id="mostrarChat" onclick="mostrarChat()">-</button>
+        </div>
+        <div class="chat" id="chatMain">
+            <div class="inner-chat" id="chat">
+                @if (mensagens != null)
+                {
+                    @foreach (var mensagem in mensagens.OrderBy(m => m.DataEnvio))
+                    {
+                        var position = nomeUsuario == mensagem.NomeUsuario ? "text-right" : "text-left";
+                        var alert = nomeUsuario == mensagem.NomeUsuario ? "alert-light" : "alert-dark";
+                        <div class="row">
+                            <div class="col-md-12 @position">
+                                <img src="@linkImagemUsuario" class="usuario-imagem @position" />
+                                <small class="text-dark">@mensagem.NomeUsuario</small>
+                                <div class="alert mb-0 @alert" role="alert">
+                                    <span class="d-block">@mensagem.Texto</span>
+                                </div>
+                                <small class="text-info">@mensagem.DataEnvio.ToString("dd/MM HH:mm")</small>
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+        <form asp-action="EnviarMensagem" id="SendMessageForm" class="row enviar">
+            <div class="input-group col-md-12 mb-4">
+                <input name="Texto" id="MessageText" class="form-control" />
+                <button type="submit" id="submitBtn" class="btn btn-info" value="">Enviar</button>
+            </div>
+        </form>
+    </div>
+    #endregion
+}
+
+@{ 
+    #region Lista de amigos
+    <div class="lista-amigos" id="lista">
+        <div class="friend-title title" id="title-amigo">
+            Lista de amigos
+            <button id="mostrarLista" onclick="mostrarLista()">-</button>
+        </div>
+        @if (amigos != null)
+        {
+            <ul class="list-group" id="amigos">
+                @foreach (Usuario amigo in amigos)
+                {
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        @amigo.UserName
+                        <button type="button" id="abrirPrivado" class="btn btn-info abrirPrivado" value="@amigo.Id">Enviar mensagem</button>
+                    </li>
+                }
+            </ul>
+        }
+    </div>
+    #endregion
+}
+
+
+
+@section scripts
+{
+    <!-- Chat geral -->
+    <script>
+        var nomeUsuario = "@nomeUsuario";
+        var linkImagemUsuario = "@linkImagemUsuario";
+        var linkPerfil = "@linkPerfil";
+        var idAtual = "@ViewBag.linkPerfil";
+        var objDiv = document.getElementById("chatMain");
+        objDiv.scrollTop = objDiv.scrollHeight;
+
+        /*Construir e estilizar mensagens novas enviadas por websocket*/
+        function formatDate(dateString) {
+            var date = new Date(Date.parse(dateString))
+            var dateStr =
+                ("00" + date.getDate()).slice(-2) + "/" +
+                ("00" + (date.getMonth() + 1)).slice(-2) + " " +
+                ("00" + date.getHours()).slice(-2) + ":" +
+                ("00" + date.getMinutes()).slice(-2)
+            return dateStr
+        }
+
+        connection.on("ReceberMensagem", (data) => {
+            console.log(data);
+            innerChatId = "chat";
+            criarMensagem(data);
+        });
+
+        connection.on("CarregarMensagens", (mensagens, alvo) => {
+            console.log(mensagens);
+            console.log(mensagens);
+            var chatBody = document.createElement("div");
+            chatBody.classList = "container-chat amigo";
+            chatBody.id = "container-chat-amigo";
+
+            console.log(mensagens);
+            var chatTitle = document.createElement("div");
+            chatTitle.classList = "chat-title title amigo";
+            chatTitle.id = "titleAmigo";
+            chatTitle.textContent = "Chat com " + alvo;
+
+            console.log(mensagens);
+            var chat = document.createElement("div");
+            chat.classList = "chat amigo";
+            chat.id = "chatAmigoMain";
+
+            console.log(mensagens);
+            var innerChat = document.createElement("div");
+            innerChat.classList = "inner-chat amigo";
+            innerChat.id = "chatAmigo";
+
+            console.log(mensagens);
+            var form = document.createElement("form");
+            form.classList = "row enviar amigo";
+            form.id = "SendPrivateMessageForm";
+
+            console.log(mensagens);
+            var inputAndButton = document.createElement("div");
+            inputAndButton.classList = "input-group col-md-12 mb-4 amigo";
+
+            console.log(mensagens);
+            var input = document.createElement("input");
+            input.classList = "form-control amigo";
+            input.id = "MessageAmigoText";
+            input.name = "TextoAmigo";
+
+            console.log(mensagens);
+            var inputButton = document.createElement("button");
+            inputButton.type = "submit";
+            inputButton.id = "submitAmigoBtn";
+            inputButton.classList = "btn btn-info amigo";
+            inputButton.textContent = "Enviar";
+
+            console.log(mensagens);
+            document.getElementById("SendMessageForm").style.right = "1000px"
+            document.getElementById("title").style.right = "1000px"
+            document.getElementById("chatMain").style.right = "1000px"
+            document.getElementById("container-chat").style.right = "1000px"
+
+            console.log(mensagens);
+            chatBody.appendChild(chatTitle);
+            chat.appendChild(innerChat);
+            chatBody.appendChild(chat);
+            form.appendChild(inputAndButton);
+            inputAndButton.appendChild(input);
+            inputAndButton.appendChild(inputButton);
+            chatBody.appendChild(form);
+            document.body.appendChild(chatBody);
+
+            innerChatId = innerChat.id;
+
+            mensagens.forEach(criarMensagem);
+
+            console.log(mensagens);
+        });
+    </script>
+
+    <!-- Chat privado -->
+    <script>
+        
+    </script>
+
+    <!-- Minimizar chat geral -->
+    <script>
+        function mostrarChat() {
+            var mostrarBotao = document.getElementById("mostrarChat");
+            if (mostrarBotao.textContent === "+") {
+                mostrarBotao.textContent = "-";
+                document.getElementById("container-chat").style.height = "623px"
+                document.getElementById("chatMain").style.display = "block";
+                document.getElementById("title").style.bottom = "570px";
+                document.getElementById("SendMessageForm").style.display = "block";
+            } else {
+                mostrarBotao.textContent = "+";
+                document.getElementById("container-chat").style.height = "6vh"
+                document.getElementById("chatMain").style.display = "none";
+                document.getElementById("title").style.bottom = "0";
+                document.getElementById("SendMessageForm").style.display = "none";
+            }
+        }
+    </script>
+
+    <!-- Minimizar lista de amigos -->
+    <script>
+        function mostrarLista() {
+            var mostrarBotao = document.getElementById("mostrarLista");
+            if (mostrarBotao.textContent === "+") {
+                mostrarBotao.textContent = "-";
+                document.getElementById("lista").style.height = "61.6vh"
+                document.getElementById("title-amigo").style.bottom = "61.6vh";
+                document.getElementById("amigos").style.display = "block";
+            } else {
+                mostrarBotao.textContent = "+";
+                document.getElementById("lista").style.height = "6vh"
+                document.getElementById("title-amigo").style.bottom = "0";
+                document.getElementById("amigos").style.display = "none";
+            }
+        }
+    </script>
+}
