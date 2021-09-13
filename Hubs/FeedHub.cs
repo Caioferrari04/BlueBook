@@ -102,17 +102,49 @@ namespace BlueBook.Hubs
             await Clients.Users(usuarios).SendAsync("RecusarPedido", usuarioDestino.UserName);
         }
 
-        public async Task AbrirChatPrivado(string origem, string destino)
+        public async Task EnviarMensagensPrivadas(Mensagem mensagem)
         {
-            var usuarioOrigem = await userManager.FindByIdAsync(origem);
-            var usuarioDestino = await userManager.FindByIdAsync(destino);
+            if (mensagem.UsuarioID != Context.UserIdentifier) return;
 
+            Usuario usuarioOrigem = await userManager.FindByIdAsync(mensagem.UsuarioID);
+            Usuario usuarioDestino = await userManager.FindByIdAsync(mensagem.AlvoId);
 
-            var mensagensEnviadas = context.Mensagem.Where(m => m.UsuarioID == usuarioOrigem.Id && m.AlvoId == usuarioDestino.Id).ToList();
-            var mensagensRecebidas = context.Mensagem.Where(m => m.UsuarioID == usuarioDestino.Id && m.AlvoId == usuarioOrigem.Id).ToList();
-            var mensagens = mensagensEnviadas.Concat(mensagensRecebidas).ToList();
+            if (usuarioDestino == null) return;
 
-            await Clients.User(origem).SendAsync("CarregarMensagens", mensagens, usuarioDestino.UserName);
+            mensagem.DataEnvio = DateTime.Now;
+
+            context.Mensagem.Add(mensagem);
+            context.SaveChanges();
+            Mensagem retorno = new Mensagem
+            {
+                NomeUsuario = mensagem.NomeUsuario,
+                Texto = mensagem.Texto,
+                DataEnvio = mensagem.DataEnvio,
+                UsuarioID = mensagem.UsuarioID
+            };
+
+            string[] usuarios = new string[] { usuarioDestino.UserName, usuarioOrigem.UserName};
+            Array.Sort(usuarios, 0, 2);
+            string group = usuarios[0] + usuarios[1];
+
+            await Clients.Group(group).SendAsync("ReceberMensagemPrivada", retorno, usuarioDestino.Id);
+        }
+
+        public Task EntrarGrupo(string destino)
+        {
+            var origem = Context.User.Identity.Name;
+            string[] usuarios = new string[] { destino, origem};
+            Array.Sort(usuarios, 0, 2);
+            string group = usuarios[0] + usuarios[1];
+            return Groups.AddToGroupAsync(Context.ConnectionId, group);
+        }
+        public Task SairGrupo(string destino)
+        {
+            var origem = Context.User.Identity.Name;
+            string[] usuarios = new string[] { destino, origem };
+            Array.Sort(usuarios, 0, 2);
+            string group = usuarios[0] + usuarios[1];
+            return Groups.RemoveFromGroupAsync(Context.ConnectionId, group);
         }
     }
 }

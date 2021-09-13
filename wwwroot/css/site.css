@@ -71,14 +71,13 @@ body {
 }
 
 .chat-title {
-    bottom: 570px;
     z-index: 4;
-    right: 46vh;
     width: 500px;
     border-top-left-radius: 4vh;
 }
 
 .friend-title {
+    position: fixed;
     bottom: 61.6vh;
     z-index: 4;
     right: 0;
@@ -88,7 +87,6 @@ body {
 .title {
     display: flex;
     justify-content: space-between;
-    position: fixed;
     box-shadow: rgba(50, 50, 105, 0.15) 0px 2px 5px 0px, rgba(0, 0, 0, 0.05) 0px 1px 1px 0px;
     font-size: 3.5vh;
     padding-left: 2vh;
@@ -96,9 +94,6 @@ body {
 }
 
 .chat {
-    position: fixed;
-    bottom: 6vh;
-    right: 46vh;
     width: 500px;
     height: 512.06px;
     background-color: white;
@@ -121,12 +116,12 @@ body {
     z-index: 4;
     background-color: white;
     border-top-left-radius: 4vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 .enviar {
-    position: fixed;
     z-index: 4;
-    bottom: 0;
-    right: 47.6vh;
     padding-left: 2vh;
     padding-right: 2vh;
     padding-top: 1vh;
@@ -150,7 +145,7 @@ body {
     border-radius: 20vh
 }
 
-#mostrarChat,#mostrarLista {
+.mostrarChat {
     border: 0px;
     background-color: transparent;
 }
@@ -188,4 +183,8 @@ body {
     flex-direction: row;
     justify-content: space-evenly;
     width: inherit;
+}
+
+.privado {
+    display: none;
 }

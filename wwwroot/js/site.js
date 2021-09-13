@@ -1,9 +1,4 @@
-﻿// Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification
-// for details on configuring this project to bundle and minify static web assets.
-
-// Write your JavaScript code.
-
-var connection = new signalR.HubConnectionBuilder().withUrl("/feedhub").build();
+﻿var connection = new signalR.HubConnectionBuilder().withUrl("/feedhub").build();
 var innerChatId = "chat";
 
 connection.on("PedidoAmizade", (idOrigem, idDestino, nomeUsuario) => {
@@ -99,6 +94,7 @@ connection.on("RecusarPedido", (destino) => {
 });
 
 function criarMensagem(mensagem) {
+    console.log("teste");
     var position = mensagem.nomeUsuario === nomeUsuario ? "text-right" : "text-left";
     var alert = mensagem.nomeUsuario === nomeUsuario ? "alert-light" : "alert-dark";
 
@@ -138,6 +134,7 @@ function criarMensagem(mensagem) {
     messageCol.appendChild(messageDt);
     message.appendChild(messageCol);
     console.log(message);
+    console.log(innerChatId);
     document.getElementById(innerChatId).appendChild(message);
     objDiv.scrollTop = objDiv.scrollHeight;
 }
@@ -146,7 +143,6 @@ connection.start().then(function () {
     console.log("Conectado")
     var mensagens = document.getElementById("SendMessageForm");
     var pedido = document.getElementById("enviarPedido");
-    var privado = document.getElementById("abrirPrivado");
     if (mensagens != null) {
         mensagens.addEventListener("submit", function (event) {
             event.preventDefault();
@@ -169,15 +165,6 @@ connection.start().then(function () {
             console.log("1");
             connection.invoke("enviarPedidoAmizade", origem, destino).catch(function (err) {
                 return console.error(err.toString());
-            });
-        });
-    }
-    if (privado != null) {
-        privado.addEventListener("click", function (event) {
-            event.preventDefault();
-            var destino = privado.value;
-            connection.invoke("abrirChatPrivado", idAtual, destino).catch(function (error) {
-                return console.error(error.toString());
             });
         });
     }
