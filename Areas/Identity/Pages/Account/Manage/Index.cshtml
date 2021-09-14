@@ -1,0 +1,29 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Perfil";
+    ViewData["ActivePage"] = ManageNavPages.Index;
+}
+
+<h4>@ViewData["Title"]</h4>
+<div class="row">
+    <div class="col-md-6">
+        <form id="email-form" asp-controller="User" asp-action="PaginaUsuario">
+            <div class="form-group">
+                <label asp-for="Input.LinkImagem"></label>
+                <input name="ImgEdit" class="form-control" placeholder="Link da nova imagem..." />
+            </div>
+            <div class="form-group">
+                <label asp-for="Input.Username"></label>
+                <input name="NameEdit" class="form-control" placeholder="Novo nome..." />
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary" id="editarPerfilFim">Editar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

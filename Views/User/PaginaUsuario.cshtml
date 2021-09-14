@@ -1,0 +1,13 @@
+﻿@model Usuario
+
+<div class="p-5 m-md-3 mb-4 bg-perfil rounded-pill" id="editarFalso">
+    <div class="container-fluid py-5">
+        <div class="row align-items-center editar-falso">
+            <img src="@Model.LinkImagem" class="img-perfil img-fluid editar-falso" />
+            <div class="flex-column">
+                <h1 class="display-5 fw-bold">@Model.UserName</h1>
+                <a class="btn btn-outline-primary editar-falso" href="/Identity/Account/Manage">Editar perfil</a>
+            </div>
+        </div>
+    </div>
+</div>

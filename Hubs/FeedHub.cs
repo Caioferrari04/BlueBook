@@ -25,11 +25,14 @@ namespace BlueBook.Hubs
         {
             mensagem.DataEnvio = DateTime.Now;
 
-            if (mensagem.NomeUsuario != Context.User.Identity.Name) return;
+            /*Alterado de Context.User.Identity.Name para Context.UserIdentifier por conta da possibilidade de alteração de nome,
+             permitindo que a mensagem seja enviada, pois Context.User.Identity.Name comparavara o nome do usuario atual com o
+             seu email.*/
+            if (mensagem.UsuarioID != Context.UserIdentifier) return;
 
-            var usuario = context.Users.FirstOrDefault(u => u.UserName == mensagem.NomeUsuario);
+            Usuario usuarioAtual = await userManager.FindByIdAsync(mensagem.UsuarioID);
 
-            if (usuario == null) return;
+            if (usuarioAtual == null) return;
 
             context.Mensagem.Add(mensagem);
             context.SaveChanges();
@@ -39,7 +42,8 @@ namespace BlueBook.Hubs
                 NomeUsuario = mensagem.NomeUsuario,
                 Texto = mensagem.Texto,
                 DataEnvio = mensagem.DataEnvio,
-                UsuarioID = usuario.Id
+                UsuarioID = usuarioAtual.Id,
+                usuario = new Usuario { LinkImagem = usuarioAtual.LinkImagem }
             };
 
             await Clients.All.SendAsync("ReceberMensagem", retorno);
@@ -128,7 +132,9 @@ namespace BlueBook.Hubs
                 NomeUsuario = mensagem.NomeUsuario,
                 Texto = mensagem.Texto,
                 DataEnvio = mensagem.DataEnvio,
-                UsuarioID = mensagem.UsuarioID
+                UsuarioID = mensagem.UsuarioID,
+                AlvoId = mensagem.AlvoId,
+                usuario = new Usuario { LinkImagem = usuarioOrigem.LinkImagem}
             };
 
             string[] usuarios = new string[] { usuarioDestino.UserName, usuarioOrigem.UserName};

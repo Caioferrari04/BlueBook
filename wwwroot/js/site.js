@@ -110,7 +110,7 @@ function criarMensagem(mensagem) {
     messageLink.href = "/User/Index/" + mensagem.usuarioID;
 
     var messageImg = document.createElement("img");
-    messageImg.src = linkImagemUsuario;
+    messageImg.src = mensagem.usuario.linkImagem;
     messageImg.className = "usuario-imagem";
 
     var messageUser = document.createElement("small");
@@ -152,7 +152,7 @@ connection.start().then(function () {
             var data = {
                 Texto: document.getElementById("MessageText").value,
                 NomeUsuario: nomeUsuario,
-                LinkImagem: linkImagemUsuario,
+                UsuarioID: idAtual
             }
 
             document.getElementById("MessageText").value = ""

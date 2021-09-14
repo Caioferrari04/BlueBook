@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace BlueBook.Controllers
@@ -22,29 +24,61 @@ namespace BlueBook.Controllers
         }
         public async Task<IActionResult> Index(string Id)
         {
-            var usuarioAtual = await userManager.FindByNameAsync(User.Identity.Name);
-            ViewBag.UsuarioAtual = usuarioAtual.Id;
-            var usuario = await userManager.FindByIdAsync(Id);
-            return usuario != null ? View(usuario) : RedirectToAction(nameof(NotFound));
+            Usuario usuarioAtual = await userManager.GetUserAsync(User);
+            Usuario usuario = await userManager.FindByIdAsync(Id);
+            if(usuarioAtual.Id != usuario.Id) { 
+                ViewBag.UsuarioAtual = usuarioAtual.Id;
+                List<Amizade> amizades = context.Amizade.Where(a => a.AlvoId == usuarioAtual.Id || a.OrigemId == usuarioAtual.Id).ToList();
+                foreach (Amizade amizade in amizades)
+                    if (amizade.AlvoId == usuario.Id || amizade.OrigemId == usuario.Id)
+                        ViewBag.AmigoOuNao = true;
+                if (ViewBag.AmigoOuNao == null) ViewBag.AmigoOuNao = false;
+                return usuario != null ? View(usuario) : RedirectToAction(nameof(NotFound));
+            }
+            return RedirectToAction(nameof(PaginaUsuario), Id);
         }
 
-        public new IActionResult NotFound()
-        {
-            return View();
-        }
+        public new IActionResult NotFound() => View();
 
-        [Route("/{origem}/{destino}")]
-        public async Task<IActionResult> RemoveFriend(string origem, string destino)
+        public async Task<IActionResult> RemoveFriend(string destino)
         {
-            Usuario usuarioOrigem = await userManager.FindByIdAsync(origem);
+            Usuario usuarioOrigem = await userManager.GetUserAsync(User);
             Usuario usuarioDestino = await userManager.FindByIdAsync(destino);
-
-            var amizadeOrigem = usuarioOrigem.Origem.Find(u => u.AlvoId == usuarioDestino.Id && u.OrigemId == usuarioOrigem.Id);
-            var amizadeAlvo = usuarioDestino.Origem.Find(u => u.AlvoId == usuarioOrigem.Id && u.OrigemId == usuarioDestino.Id);
-            usuarioDestino.Origem.Remove(amizadeAlvo);
-            usuarioOrigem.Origem.Remove(amizadeOrigem);
-            context.SaveChanges();
-            return RedirectToAction("Index", "Feed", new { area = "" });
+            Amizade amizade = context.Amizade.Find(usuarioOrigem.Id, usuarioDestino.Id);
+            amizade = amizade == null ? context.Amizade.Find(usuarioDestino.Id, usuarioOrigem.Id) : amizade;
+            if(amizade != null) { 
+                context.Amizade.Remove(amizade);
+                context.SaveChanges();
+                return RedirectToAction("Index", "Feed", new { area = "" });
+            }
+            return RedirectToAction(nameof(NotFound));
         }
+
+        public async Task<IActionResult> PaginaUsuario(string id)
+        {
+            Usuario usuarioAtual = await userManager.GetUserAsync(User);
+            return id == usuarioAtual.Id ? View(usuarioAtual) : RedirectToAction(nameof(NotFound));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> PaginaUsuario(string ImgEdit, string NameEdit)
+        {
+            Usuario usuarioAtual = await userManager.GetUserAsync(User);
+            usuarioAtual.UserName = NameEdit != null ? NameEdit.Trim() : usuarioAtual.UserName;
+            usuarioAtual.NormalizedUserName = NameEdit != null ? NameEdit.Trim().Normalize() : usuarioAtual.UserName;
+            usuarioAtual.LinkImagem = ImgEdit == null ? "https://freepikpsd.com/media/2019/10/default-user-profile-image-png-6-Transparent-Images.png" : ImgEdit;
+            context.Users.Update(usuarioAtual);
+            context.SaveChanges();
+            /*Foi necessário utilizar um objeto aqui pois utilizar uma string levava o Redirect a identificar a string
+             como um controller.*/
+            RouteValues IdPagina = new RouteValues() { Id = usuarioAtual.Id };
+            return RedirectToAction(nameof(PaginaUsuario), IdPagina);
+        }
+    }
+
+    public class RouteValues
+    {
+        public string Id { get; set; }
     }
 }

@@ -90,7 +90,8 @@ body {
     box-shadow: rgba(50, 50, 105, 0.15) 0px 2px 5px 0px, rgba(0, 0, 0, 0.05) 0px 1px 1px 0px;
     font-size: 3.5vh;
     padding-left: 2vh;
-    padding-bottom: 0.5vh;
+    padding-bottom: 0.2vh;
+    border-bottom: 0.5px solid darkgrey;
 }
 
 .chat {
@@ -121,12 +122,12 @@ body {
     align-items: center;
 }
 .enviar {
+    display: flex;
+    justify-content: space-between;
     z-index: 4;
-    padding-left: 2vh;
-    padding-right: 2vh;
-    padding-top: 1vh;
     border-top: 0.1vh solid lightgrey;
     width: 500px;
+    height: 50px;
     background-color: white;
 }
 
@@ -140,14 +141,15 @@ body {
 }
 
 .usuario-imagem {
-    width: 3vh;
     height: 3vh;
+    width: 3vh;
     border-radius: 20vh
 }
 
 .mostrarChat {
     border: 0px;
     background-color: transparent;
+    border-radius: 20vh;
 }
 
 .lista-amigos {
@@ -187,4 +189,27 @@ body {
 
 .privado {
     display: none;
+    border-radius: 0;
+}
+
+.abrir-chat:hover {
+    background-color: lightgrey;
+    border: 0.2px solid black;
+    transition: 0.3s;
+}
+
+.abrir-chat:active {
+    background-color: whitesmoke;
+    border: 0.5px solid black;
+    transition: 0.1s;
+}
+
+.img-perfil {
+    border-radius: 100vh;
+    height: 20vh;
+    width: 20vh;
+}
+
+.bg-perfil {
+    background-color: lightgray;
 }
