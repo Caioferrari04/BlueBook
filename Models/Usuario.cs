@@ -16,6 +16,8 @@ namespace BlueBook.Models
 
         public List<Comentario> Comentarios { get; set; }
 
-        public List<Usuario> Amigos { get; set; }
+        public List<Amizade> Origem { get; set; }
+
+        public List<Amizade> Alvo { get; set; }
     }
 }

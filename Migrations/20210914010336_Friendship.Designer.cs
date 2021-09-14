@@ -4,14 +4,16 @@ using BlueBook.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace BlueBook.Migrations
 {
     [DbContext(typeof(BookContext))]
-    partial class BookContextModelSnapshot : ModelSnapshot
+    [Migration("20210914010336_Friendship")]
+    partial class Friendship
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -340,16 +342,16 @@ namespace BlueBook.Migrations
 
             modelBuilder.Entity("BlueBook.Models.Amizade", b =>
                 {
-                    b.HasOne("BlueBook.Models.Usuario", "Origem")
-                        .WithMany("Alvo")
-                        .HasForeignKey("AlvoId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("BlueBook.Models.Usuario", "Alvo")
                         .WithMany("Origem")
-                        .HasForeignKey("OrigemId")
+                        .HasForeignKey("AlvoId")
                         .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("BlueBook.Models.Usuario", "Origem")
+                        .WithMany("Alvo")
+                        .HasForeignKey("OrigemId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Alvo");

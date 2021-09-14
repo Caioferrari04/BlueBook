@@ -39,11 +39,10 @@ namespace BlueBook.Controllers
             Usuario usuarioOrigem = await userManager.FindByIdAsync(origem);
             Usuario usuarioDestino = await userManager.FindByIdAsync(destino);
 
-            usuarioOrigem.Amigos.Remove(usuarioDestino);
-            context.Update(usuarioOrigem);
-
-            usuarioDestino.Amigos.Remove(usuarioOrigem);
-            context.Update(usuarioDestino);
+            var amizadeOrigem = usuarioOrigem.Origem.Find(u => u.AlvoId == usuarioDestino.Id && u.OrigemId == usuarioOrigem.Id);
+            var amizadeAlvo = usuarioDestino.Origem.Find(u => u.AlvoId == usuarioOrigem.Id && u.OrigemId == usuarioDestino.Id);
+            usuarioDestino.Origem.Remove(amizadeAlvo);
+            usuarioOrigem.Origem.Remove(amizadeOrigem);
             context.SaveChanges();
             return RedirectToAction("Index", "Feed", new { area = "" });
         }

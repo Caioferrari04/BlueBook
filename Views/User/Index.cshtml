@@ -5,7 +5,7 @@
     var destino = Model.Id as string;
     bool isAmigo = false;
 }
-@if (Model.Amigos != null)
+@*@if (Model.Amigos != null)
 {
     @foreach (Usuario amigo in Model.Amigos)
     {
@@ -14,7 +14,7 @@
             isAmigo = true;
         }
     }
-}
+}*@
 
 <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -65,7 +65,7 @@
         function ShowModal() {
             $('#staticBackdrop').modal('toggle');
             $('#staticBackdrop').modal('show');
-        };
+        }
         function HideModal() {
             $('#staticBackdrop').modal('hide');
         }

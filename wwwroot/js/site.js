@@ -2,6 +2,7 @@
 var innerChatId = "chat";
 
 connection.on("PedidoAmizade", (idOrigem, idDestino, nomeUsuario) => {
+    console.log("3");
     console.log(idOrigem);
     console.log(nomeUsuario);
     var origem = idOrigem;
@@ -33,6 +34,7 @@ connection.on("PedidoAmizade", (idOrigem, idDestino, nomeUsuario) => {
     document.body.appendChild(modalAmizade);
     botaoAceitar.addEventListener("click", function (event) {
         event.preventDefault();
+        console.log("2");
         connection.invoke("aceitarPedidoAmizade", origem, destino).catch(function (err) {
             return console.error(err.toString());
         });
@@ -168,7 +170,4 @@ connection.start().then(function () {
             });
         });
     }
-    
-}).catch(function (err) {
-    return console.error(err.toString());
 });

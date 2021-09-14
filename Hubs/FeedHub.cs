@@ -73,16 +73,24 @@ namespace BlueBook.Hubs
             usuarios.Add(usuarioOrigem.Id);
             usuarios.Add(usuarioDestino.Id);
 
-            List<Usuario> amigos = usuarioOrigem.Amigos != null ? usuarioOrigem.Amigos : new List<Usuario>();
+            Amizade novaAmizadeOrigem = new Amizade()
+            {
+                Origem = usuarioOrigem,
+                Alvo = usuarioDestino
+            };
 
-            amigos.Add(usuarioDestino);
-            usuarioOrigem.Amigos = amigos;
+            Amizade novaAmizadeAlvo = new Amizade()
+            {
+                OrigemId = usuarioDestino.Id,
+                AlvoId = usuarioOrigem.Id
+            };
+
+            List<Amizade> amizades = new List<Amizade>() { novaAmizadeOrigem };
+            usuarioOrigem.Origem = amizades;
+
+            amizades[0] = novaAmizadeAlvo;
+            usuarioDestino.Origem = amizades;
             context.Update(usuarioOrigem);
-
-            amigos = usuarioDestino.Amigos != null ? usuarioDestino.Amigos : new List<Usuario>();
-
-            amigos.Add(usuarioOrigem);
-            usuarioDestino.Amigos = amigos;
             context.Update(usuarioDestino);
             context.SaveChanges();
 

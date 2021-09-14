@@ -6,7 +6,6 @@
     var nomeUsuario = ViewBag.NomeUsuarioLogado as string;
     var linkImagemUsuario = ViewBag.LinkImagem as string;
     var Postagens = ViewBag.Postagens as List<Postagem>;
-    var amigos = ViewBag.Amigos as List<Usuario>;
     var linkPerfil = $"/User/Index/{ViewBag.linkPerfil}" as string;
 }
 
@@ -89,13 +88,13 @@
     #region Lista de amigos
     <div class="lista-amigos" id="lista">
         <div class="friend-title title" id="title-amigo">
-            Lista de amigos
+            Lista de amigos @Model.Count
             <button class="mostrarChat" id="mostrarLista" onclick="mostrarLista()">-</button>
         </div>
-        @if (amigos != null)
+        @if (Model != null)
         {
             <ul class="list-group" id="amigos">
-                @foreach (Usuario amigo in amigos)
+                @foreach (Usuario amigo in Model)
                 {
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         @amigo.UserName
@@ -108,9 +107,9 @@
     #endregion
     #region Chats privados
     
-    if (amigos != null)
+    if (Model != null)
     {   
-        @foreach(Usuario amigo in amigos) 
+        @foreach(Usuario amigo in Model) 
         { 
             <div class="container-chat privado" id="container-chat-@amigo.Id">
                 <div class="chat-title title" id="title-@amigo.Id">
@@ -210,6 +209,9 @@
             document.getElementById("container-chat-" + destino).style.display = "flex"
             document.getElementById("container-chat").style.right = "950px";
 
+            var objDivPriv = document.getElementById("chatMain-" + destino);
+            objDivPriv.scrollTop = objDivPriv.scrollHeight;
+
             var botaoMostrar = document.getElementById("mostrarChat-" + destino);
             console.log("teste");
             botaoMostrar.addEventListener("click", () => {
@@ -239,30 +241,30 @@
             });
         };
     </script>
-@if(amigos != null) {
-    @for(int i = 0; i < amigos.Count; i++) {
+@if(Model != null) {
+    @for(int i = 0; i < Model.Count; i++) {
         <script>
-            document.getElementById("abrirPrivado-@amigos[i].Id").addEventListener("click", function (event) {
+            document.getElementById("abrirPrivado-@Model[i].Id").addEventListener("click", function (event) {
                 event.preventDefault();
-                CarregarChat("@amigos[i].Id", "@amigos[i].UserName");
+                CarregarChat("@Model[i].Id", "@Model[i].UserName");
             });
-            document.getElementById("SendMessageForm-@amigos[i].Id").addEventListener("submit", function (event) {
+            document.getElementById("SendMessageForm-@Model[i].Id").addEventListener("submit", function (event) {
                 event.preventDefault();
                 var data = {
-                    Texto: document.getElementById("MessageText-@amigos[i].Id").value,
+                    Texto: document.getElementById("MessageText-@Model[i].Id").value,
                     NomeUsuario: nomeUsuario,
                     LinkImagem: linkImagemUsuario,
-                    AlvoId: "@amigos[i].Id",
+                    AlvoId: "@Model[i].Id",
                     UsuarioID: idAtual
                 }
 
-                document.getElementById("MessageText-@amigos[i].Id").value = ""
+                document.getElementById("MessageText-@Model[i].Id").value = ""
                 connection.invoke("enviarMensagensPrivadas", data).catch(function (err) {
                     return console.error(err.toString());
                 });
             });
             window.addEventListener("unload", function () {
-                connection.invoke("SairGrupo", "@amigos[i].UserName");
+                connection.invoke("SairGrupo", "@Model[i].UserName");
             });
         </script>
     }
