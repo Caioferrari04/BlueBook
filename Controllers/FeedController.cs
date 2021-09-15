@@ -69,5 +69,25 @@ namespace BlueBook.Controllers
             //return RedirectToAction(nameof(Index));
             return Ok();
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Postar(string TxtPost, string ImgPost = null)
+        {
+            if (TxtPost == null) return RedirectToAction(nameof(Index));
+            Usuario poster = await userManager.GetUserAsync(User);
+            Postagem postagem = new Postagem()
+            {
+                Texto = TxtPost,
+                UrlImagem = ImgPost,
+                UsuarioIdPost = poster.Id,
+                UsuarioPost = poster,
+                DataPostagem = DateTime.Now
+            };
+
+            context.Postagem.Add(postagem);
+            context.SaveChanges();
+            return RedirectToAction(nameof(Index));
+        }
     }
 }

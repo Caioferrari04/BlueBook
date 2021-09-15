@@ -15,6 +15,8 @@ namespace BlueBook.Models
 
         public int Likes { get; set; }
 
+        public DateTime DataPostagem { get; set; }
+
         public string UrlImagem { get; set; }
 
         public string UsuarioIdPost { get; set; }

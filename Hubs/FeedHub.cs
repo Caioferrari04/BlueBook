@@ -4,6 +4,7 @@ using BlueBook.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,13 +27,15 @@ namespace BlueBook.Hubs
             mensagem.DataEnvio = DateTime.Now;
 
             /*Alterado de Context.User.Identity.Name para Context.UserIdentifier por conta da possibilidade de alteração de nome,
-             permitindo que a mensagem seja enviada, pois Context.User.Identity.Name comparavara o nome do usuario atual com o
+             permitindo que a mensagem seja enviada, pois Context.User.Identity.Name comparava o nome do usuario atual com o
              seu email.*/
             if (mensagem.UsuarioID != Context.UserIdentifier) return;
 
             Usuario usuarioAtual = await userManager.FindByIdAsync(mensagem.UsuarioID);
 
             if (usuarioAtual == null) return;
+
+            if (mensagem.Texto.Trim() == "") return;
 
             context.Mensagem.Add(mensagem);
             context.SaveChanges();
@@ -114,6 +117,43 @@ namespace BlueBook.Hubs
             await Clients.Users(usuarios).SendAsync("RecusarPedido", usuarioDestino.UserName);
         }
 
+        /*Feito para carregar mensagens em caso do usuário receber uma mensagem enquanto está com o chat geral ou privado fechado*/
+        /*Eu odeio isso, isso é feio, isso provavelmente é muito mau-otimizado, mas funciona.*/
+        public async Task CarregarMensagensEnviadas(string origem, List<Mensagem> mensagensCarregadas, string destino = null)
+        {
+            if (origem != Context.UserIdentifier) return;
+
+            var mensagens = from mensagem in context.Set<Mensagem>()
+                            join usuario in context.Set<Usuario>()
+                            on mensagem.UsuarioID equals usuario.Id
+                            select new Mensagem()
+                            {
+                                Texto = mensagem.Texto,
+                                AlvoId = mensagem.AlvoId,
+                                UsuarioID = usuario.Id,
+                                DataEnvio = mensagem.DataEnvio,
+                                NomeUsuario = usuario.UserName,
+                                ID = mensagem.ID,
+                                usuario = new Usuario()
+                                {
+                                    LinkImagem = usuario.LinkImagem
+                                }
+                            };
+            var mensagemPreRetorno = await mensagens.ToListAsync();
+            List<Mensagem> mensagemRetorno = new List<Mensagem>();
+            List<Mensagem> mensagensParaRemover = new List<Mensagem>();
+            foreach(Mensagem mensagem in mensagemPreRetorno)
+                foreach(Mensagem mensagemCarregada in mensagensCarregadas)
+                    if(mensagemCarregada.ID == mensagem.ID) {
+                        mensagensParaRemover.Add(mensagem);
+                        break;
+                    }
+            for(int i = 0; i < mensagensParaRemover.Count; i++)
+                mensagemPreRetorno.Remove(mensagensParaRemover[i]);
+            mensagemRetorno = mensagemPreRetorno;
+            await Clients.User(origem).SendAsync("CarregarMensagens", mensagemRetorno, destino);
+        }
+
         public async Task EnviarMensagensPrivadas(Mensagem mensagem)
         {
             if (mensagem.UsuarioID != Context.UserIdentifier) return;
@@ -124,6 +164,8 @@ namespace BlueBook.Hubs
             if (usuarioDestino == null) return;
 
             mensagem.DataEnvio = DateTime.Now;
+
+            if (mensagem.Texto.Trim() == "") return;
 
             context.Mensagem.Add(mensagem);
             context.SaveChanges();

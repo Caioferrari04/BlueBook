@@ -14,6 +14,8 @@ namespace BlueBook.Models
 
         public string ImagemUrl { get; set; }
 
+        public DateTime DataComentado { get; set; }
+
         public string UsuarioIdComentario { get; set; }
 
         public Usuario UsuarioComentario { get; set; }
