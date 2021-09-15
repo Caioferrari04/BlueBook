@@ -14,6 +14,8 @@ namespace BlueBook.Models
 
         public string ImagemUrl { get; set; }
 
+        public int QuantidadeLikes { get; set; }
+
         public DateTime DataComentado { get; set; }
 
         public string UsuarioIdComentario { get; set; }
@@ -23,5 +25,7 @@ namespace BlueBook.Models
         public int PostagemId { get; set; }
 
         public Postagem PostagemOriginal { get; set; }
+
+        public List<ComentarioDeComentario> SubComentarios { get; set; }
     }
 }

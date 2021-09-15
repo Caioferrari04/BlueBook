@@ -4,14 +4,16 @@ using BlueBook.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace BlueBook.Migrations
 {
     [DbContext(typeof(BookContext))]
-    partial class BookContextModelSnapshot : ModelSnapshot
+    [Migration("20210915172754_Likes")]
+    partial class Likes
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -48,9 +50,6 @@ namespace BlueBook.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("PostagemId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("QuantidadeLikes")
                         .HasColumnType("int");
 
                     b.Property<string>("Texto")
@@ -91,9 +90,6 @@ namespace BlueBook.Migrations
                     b.Property<string>("UsuarioId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("TipoLike")
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("PostagemId", "UsuarioId");
 
                     b.HasIndex("UsuarioId");
@@ -108,9 +104,6 @@ namespace BlueBook.Migrations
 
                     b.Property<string>("UsuarioId")
                         .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("TipoLike")
-                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("ComentarioId", "UsuarioId");
 
@@ -159,9 +152,6 @@ namespace BlueBook.Migrations
 
                     b.Property<DateTime>("DataPostagem")
                         .HasColumnType("datetime2");
-
-                    b.Property<int>("QuantidadeLikes")
-                        .HasColumnType("int");
 
                     b.Property<string>("Texto")
                         .HasColumnType("nvarchar(max)");

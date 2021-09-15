@@ -30,6 +30,7 @@ namespace BlueBook.Controllers
             List<Amizade> amizades = context.Amizade.Where(a => a.AlvoId == usuarioAtual.Id || a.OrigemId == usuarioAtual.Id).ToList();
             List<IdentityUser> amigos = new List<IdentityUser>();
             List<Mensagem> mensagens = context.Mensagem.Include(u => u.usuario).ToList();
+            List<Likes> likes = context.Likes.ToList();
             if (usuarioAtual.LinkImagem == null)
             {
                 usuarioAtual.LinkImagem = "https://freepikpsd.com/media/2019/10/default-user-profile-image-png-6-Transparent-Images.png";
@@ -48,6 +49,7 @@ namespace BlueBook.Controllers
             ViewBag.Mensagens = mensagens;
             ViewBag.Postagens = context.Postagem.ToList();
             ViewBag.linkPerfil = usuarioAtual.Id;
+            ViewBag.Likes = likes;
             return View(amigos);
         }
 
@@ -86,6 +88,36 @@ namespace BlueBook.Controllers
             };
 
             context.Postagem.Add(postagem);
+            context.SaveChanges();
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult LikePost(string LikeBtn)
+        {
+            if (!LikeBtn.Contains("Like") && !LikeBtn.Contains("Deslike")) return RedirectToAction(nameof(Index));
+
+            string[] LikeInfo = LikeBtn.Split(":");
+            int ID = int.Parse(LikeInfo[1]);
+            string idUsuario = userManager.GetUserId(User);
+            Postagem postLike = context.Postagem.FirstOrDefault(p => p.ID == ID);
+            Likes like = context.Likes.FirstOrDefault(u => u.UsuarioId == idUsuario && u.PostagemId == postLike.ID);
+            if ( like == null) {
+                like = new Likes()
+                {
+                    UsuarioId = idUsuario,
+                    PostagemId = postLike.ID,
+                    TipoLike = LikeInfo[0]
+                };
+                postLike.QuantidadeLikes = like.TipoLike == "Like" ? postLike.QuantidadeLikes + 1 : postLike.QuantidadeLikes - 1;
+                context.Likes.Add(like);
+            } 
+            else {
+                postLike.QuantidadeLikes = like.TipoLike == "Like" ? postLike.QuantidadeLikes - 1 : postLike.QuantidadeLikes + 1;
+                context.Likes.Remove(like);
+            }
+            context.Postagem.Update(postLike);
             context.SaveChanges();
             return RedirectToAction(nameof(Index));
         }

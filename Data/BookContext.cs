@@ -51,6 +51,29 @@ namespace BlueBook.Data
                 .HasMany(u => u.Alvo)
                 .WithOne(uu => uu.Origem)
                 .HasForeignKey(uu => uu.AlvoId);
+
+            /*Uma postagem pode ter apenas um like de um determinado usuário
+             Mas pode ter vários likes de outros usuários
+            E um usuário só pode dar um like uma vez para uma postagem
+            mas pode dar um like para várias postagens*/
+            /*(1,1)Postagem <> Like(0,N)*/
+            /*(1,1)Usuario <> Like(0,N)*/
+            /*(0,N)PostagemLike <> UsuarioLike(0,N)*/
+
+            builder.Entity<Likes>()
+                .HasKey(tt => new { tt.PostagemId, tt.UsuarioId });
+
+            builder.Entity<LikesComentarios>()
+                .HasKey(tt => new { tt.ComentarioId, tt.UsuarioId });
+
+            builder.Entity<ComentarioDeComentario>()
+                .HasKey(pk => new { pk.ComentarioFonteId, pk.ComentarioFilhoId });
+
+            builder.Entity<Comentario>()
+                .HasMany(c => c.SubComentarios)
+                .WithOne(sc => sc.ComentarioFonte)
+                .HasForeignKey(fk => fk.ComentarioFonteId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
 
         public DbSet<Mensagem> Mensagem { get; set; }
@@ -60,5 +83,9 @@ namespace BlueBook.Data
         public DbSet<Comentario> Comentario { get; set; }
 
         public DbSet<Amizade> Amizade { get; set; }
+
+        public DbSet<Likes> Likes { get; set; }
+
+        public DbSet<LikesComentarios> LikesComentarios { get; set; }
     }
 }

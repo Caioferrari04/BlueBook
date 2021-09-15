@@ -13,9 +13,9 @@ namespace BlueBook.Models
         [Range(1, 300, ErrorMessage = "Mensagem deve ter no minimo 1 caracter e no máximo 300!")]
         public string Texto { get; set; }
 
-        public int Likes { get; set; }
-
         public DateTime DataPostagem { get; set; }
+
+        public int QuantidadeLikes { get; set; }
 
         public string UrlImagem { get; set; }
 
