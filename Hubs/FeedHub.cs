@@ -141,7 +141,7 @@ namespace BlueBook.Hubs
             var mensagemPreRetorno = await mensagens.ToListAsync();
             var mensagemMaisRecenteCompleta = mensagemPreRetorno.Find(m => m.ID == MensagemRecente.ID);
             List<Mensagem> mensagemRetorno = mensagemPreRetorno.Where(m => m.DataEnvio > mensagemMaisRecenteCompleta.DataEnvio).ToList();
-            mensagemRetorno = mensagemRetorno.Where(m => m.AlvoId == destino || m.UsuarioID == destino).ToList();
+            mensagemRetorno = mensagemRetorno.Where(m => (m.AlvoId == destino || m.UsuarioID == destino) && (m.AlvoId == origem || m.UsuarioID == origem)).ToList();
             await Clients.User(origem).SendAsync("CarregarMensagens", mensagemRetorno, destino);
         }
 

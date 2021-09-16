@@ -7,91 +7,152 @@ connection.on("PedidoAmizade", (idOrigem, idDestino, nomeUsuario) => {
     console.log(nomeUsuario);
     var origem = idOrigem;
     var destino = idDestino;
-    var modalAmizade = document.createElement("div");
-    modalAmizade.className = "modal-amizade";
 
-    var texto = document.createElement("p");
-    texto.textContent = nomeUsuario + " mandou um pedido de amizade, aceitar?";
+    var modal = document.createElement("div");
+    modal.classList = "modal fade";
+    modal.id = "pedidoAmizade";
+    modal.setAttribute("data-bs-backdrop", "static");
+    modal.setAttribute("data-bs-keyboard", "false");
+    modal.tabIndex = "-1";
+    modal.setAttribute("aria-labelledby", "staticBackdropLabel");
+    modal.setAttribute("aria-hidden", "true");
+
+    var modalAmizade = document.createElement("div");
+    modalAmizade.className = "modal-dialog";
+
+    var modalContent = document.createElement("div");
+    modalContent.className = "modal-content"
+
+    var modalBody = document.createElement("div");
+    modalBody.className = "modal-body";
+    modalBody.textContent = nomeUsuario + " mandou um pedido de amizade, aceitar?";
 
     var areaBotoes = document.createElement("div");
-    areaBotoes.className = "area-botoes";
+    areaBotoes.className = "modal-footer";
 
     var botaoAceitar = document.createElement("button");
     botaoAceitar.classList = "btn btn-primary btn-info";
     botaoAceitar.id = "aceitar-pedido";
     botaoAceitar.textContent = "Aceitar";
+    botaoAceitar.setAttribute("data-bs-dismiss", "modal");
+    
 
     var botaoRecusar = document.createElement("button");
     botaoRecusar.classList = "btn btn-primary btn-danger";
     botaoRecusar.id = "recusar-pedido";
     botaoRecusar.textContent = "Recusar";
+    botaoRecusar.setAttribute("data-bs-dismiss", "modal");
 
-    console.log(modalAmizade);
-    modalAmizade.appendChild(texto);
+    modalContent.appendChild(modalBody);
     areaBotoes.appendChild(botaoAceitar);
     areaBotoes.appendChild(botaoRecusar);
-    modalAmizade.appendChild(areaBotoes);
-    document.body.appendChild(modalAmizade);
+    modalContent.appendChild(areaBotoes);
+    modalAmizade.appendChild(modalContent);
+    modal.appendChild(modalAmizade);
+    document.body.appendChild(modal);
+    $('#pedidoAmizade').modal('toggle');
+    $('#pedidoAmizade').modal('show');
     botaoAceitar.addEventListener("click", function (event) {
         event.preventDefault();
         console.log("2");
         connection.invoke("aceitarPedidoAmizade", origem, destino).catch(function (err) {
             return console.error(err.toString());
         });
-        modalAmizade.remove();
+        $('#pedidoAmizade').remove();
+        $('.modal-backdrop').remove();
     });
     botaoRecusar.addEventListener("click", function (event) {
         event.preventDefault();
         connection.invoke("recusarPedidoAmizade", origem, destino).catch(function (err) {
             return console.error(err.toString());
         });
-        modalAmizade.remove();
+        $('.modal').modal('hide').data('bs.modal', null);
     });
 });
 
 connection.on("AceitarPedido", (destino) => {
-    console.log(destino);
-    var modalAmizade = document.createElement("div");
-    modalAmizade.className = "modal-amizade";
 
-    var texto = document.createElement("p");
-    texto.textContent = destino + " aceitou o pedido de amizade!";
+    var modal = document.createElement("div");
+    modal.classList = "modal fade";
+    modal.id = "pedidoAmizadeAceite";
+    modal.setAttribute("data-bs-backdrop", "static");
+    modal.setAttribute("data-bs-keyboard", "false");
+    modal.tabIndex = "-1";
+    modal.setAttribute("aria-labelledby", "staticBackdropLabel");
+    modal.setAttribute("aria-hidden", "true");
+
+    var modalAmizade = document.createElement("div");
+    modalAmizade.className = "modal-dialog";
+
+    var modalContent = document.createElement("div");
+    modalContent.className = "modal-content"
+
+    var modalBody = document.createElement("div");
+    modalBody.className = "modal-body";
+    modalBody.textContent = destino + " aceitou o pedido de amizade!";
+
+    var areaBotoes = document.createElement("div");
+    areaBotoes.className = "modal-footer";
 
     var botaoOk = document.createElement("button");
-    botaoOk.classList = "btn btn-primary btn-info";
-    botaoOk.id = "fechar-modal";
-    botaoOk.textContent = "Ok";
-
-    console.log(modalAmizade);
-    modalAmizade.appendChild(texto);
-    modalAmizade.appendChild(botaoOk);
-    document.body.appendChild(modalAmizade);
+    botaoAceitar.classList = "btn btn-primary btn-info";
+    botaoAceitar.textContent = "Ok";
+    botaoAceitar.setAttribute("data-bs-dismiss", "modal");
+    console.log("chegou aqui");
+    modalContent.appendChild(modalBody);
+    areaBotoes.appendChild(botaoOk);
+    modalContent.appendChild(areaBotoes);
+    modalAmizade.appendChild(modalContent);
+    modal.appendChild(modalAmizade);
+    document.body.appendChild(modal);
+    $('#pedidoAmizadeAceite').modal('toggle');
+    $('#pedidoAmizadeAceite').modal('show');
     botaoOk.addEventListener("click", function (event) {
         event.preventDefault();
-        modalAmizade.remove();
+        $('.modal').modal('hide').data('bs.modal', null);
     });
 });
 
 connection.on("RecusarPedido", (destino) => {
     console.log(destino);
+    var modal = document.createElement("div");
+    modal.classList = "modal fade";
+    modal.id = "pedidoAmizadeRecusado";
+    modal.setAttribute("data-bs-backdrop", "static");
+    modal.setAttribute("data-bs-keyboard", "false");
+    modal.tabIndex = "-1";
+    modal.setAttribute("aria-labelledby", "staticBackdropLabel");
+    modal.setAttribute("aria-hidden", "true");
+
     var modalAmizade = document.createElement("div");
-    modalAmizade.className = "modal-amizade";
+    modalAmizade.className = "modal-dialog";
 
-    var textoRecusa = document.createElement("p");
-    textoRecusa.textContent = destino + " recusou o pedido de amizade!";
+    var modalContent = document.createElement("div");
+    modalContent.className = "modal-content"
 
+    var modalBody = document.createElement("div");
+    modalBody.className = "modal-body";
+    modalBody.textContent = destino + " recusou o pedido de amizade!";
+    
+    var areaBotoes = document.createElement("div");
+    areaBotoes.className = "modal-footer";
+    console.log("chegou aqui");
     var botaoOk = document.createElement("button");
     botaoOk.classList = "btn btn-primary btn-info";
-    botaoOk.id = "fechar-modal";
     botaoOk.textContent = "Ok";
-
-    console.log(modalAmizade);
-    modalAmizade.appendChild(textoRecusa);
-    modalAmizade.appendChild(botaoOk);
-    document.body.appendChild(modalAmizade);
+    botaoOk.setAttribute("data-bs-dismiss", "modal");
+    
+    modalContent.appendChild(modalBody);
+    areaBotoes.appendChild(botaoOk);
+    modalContent.appendChild(areaBotoes);
+    modalAmizade.appendChild(modalContent);
+    modal.appendChild(modalAmizade);
+    document.body.appendChild(modal);
+    $('#pedidoAmizadeRecusado').modal('toggle');
+    $('#pedidoAmizadeRecusado').modal('show');
     botaoOk.addEventListener("click", function (event) {
         event.preventDefault();
-        modalAmizade.remove();
+        $('.modal').modal('hide').data('bs.modal', null);
     });
 });
 
@@ -126,7 +187,7 @@ function criarMensagem(mensagem) {
     var messageDt = document.createElement("small")
     messageDt.className = "text-info"
     messageDt.textContent = formatDate(mensagem.dataEnvio)
-
+    
     messageAlert.appendChild(messageAlertMessage);
     messageCol.appendChild(messageLink);
     messageLink.appendChild(messageImg);
