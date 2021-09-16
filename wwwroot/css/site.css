@@ -72,7 +72,7 @@ body {
 
 .chat-title {
     z-index: 4;
-    width: 500px;
+    width: 380px;
     border-top-left-radius: 4vh;
 }
 
@@ -81,7 +81,7 @@ body {
     bottom: 61.6vh;
     z-index: 4;
     right: 0;
-    width: 45vh;
+    width: 30vh;
 }
 
 .title {
@@ -96,7 +96,7 @@ body {
 }
 
 .chat {
-    width: 500px;
+    width: 380px;
     height: 512.06px;
     background-color: white;
     z-index: 4;
@@ -110,11 +110,11 @@ body {
 
 .container-chat {
     box-shadow: rgba(0, 0, 0, 0.4) 0px 2px 4px, rgba(0, 0, 0, 0.3) 0px 7px 13px -3px, rgba(0, 0, 0, 0.2) 0px -3px 0px inset;
-    width: 500px;
+    width: 380px;
     position: fixed;
-    height: 623px;
+    height: 500px;
     bottom: 0;
-    right: 46vh;
+    right: 32vh;
     z-index: 4;
     background-color: white;
     border-top-left-radius: 4vh;
@@ -127,16 +127,16 @@ body {
     justify-content: space-between;
     z-index: 4;
     border-top: 0.1vh solid lightgrey;
-    width: 500px;
-    height: 50px;
+    width: 380px;
+    height: 80px;
     background-color: white;
 }
 
-.chat::-webkit-scrollbar, .lista-amigos::-webkit-scrollbar, .container-main::-webkit-scrollbar {
-    width: 5px;
+.chat::-webkit-scrollbar, .lista-amigos::-webkit-scrollbar, .container-main::-webkit-scrollbar, .comentarioCaixa::-webkit-scrollbar {
+    width: 2px;
 }
 
-.chat::-webkit-scrollbar-thumb, .lista-amigos::-webkit-scrollbar-thumb, .container-main::-webkit-scrollbar-thumb {
+.chat::-webkit-scrollbar-thumb, .lista-amigos::-webkit-scrollbar-thumb, .container-main::-webkit-scrollbar-thumb, .comentarioCaixa::-webkit-scrollbar-thumb {
     box-shadow: inset 0 0 6px rgba(0,0,0,.3);
     background-color: silver;
 }
@@ -158,7 +158,7 @@ body {
     position: fixed;
     bottom: 0;
     right: 0;
-    width: 45vh;
+    width: 30vh;
     height: 61.6vh;
     background-color: white;
     z-index: 4;
@@ -252,4 +252,15 @@ body {
 .post-image {
     max-height: 400px;
     max-width: 799px;
+}
+
+.comentarioPost, .clicou {
+    display: none;
+}
+
+.comentarioCaixa {
+    width: 500px;
+    max-height: 400px;
+    overflow-y: scroll;
+    overflow-x: hidden;
 }

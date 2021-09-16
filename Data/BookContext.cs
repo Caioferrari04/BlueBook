@@ -65,15 +65,6 @@ namespace BlueBook.Data
 
             builder.Entity<LikesComentarios>()
                 .HasKey(tt => new { tt.ComentarioId, tt.UsuarioId });
-
-            builder.Entity<ComentarioDeComentario>()
-                .HasKey(pk => new { pk.ComentarioFonteId, pk.ComentarioFilhoId });
-
-            builder.Entity<Comentario>()
-                .HasMany(c => c.SubComentarios)
-                .WithOne(sc => sc.ComentarioFonte)
-                .HasForeignKey(fk => fk.ComentarioFonteId)
-                .OnDelete(DeleteBehavior.Restrict);
         }
 
         public DbSet<Mensagem> Mensagem { get; set; }

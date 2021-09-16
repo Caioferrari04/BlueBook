@@ -96,7 +96,6 @@ connection.on("RecusarPedido", (destino) => {
 });
 
 function criarMensagem(mensagem) {
-    console.log("teste");
     var position = mensagem.nomeUsuario === nomeUsuario ? "text-right" : "text-left";
     var alert = mensagem.nomeUsuario === nomeUsuario ? "alert-light" : "alert-dark";
 
@@ -135,10 +134,9 @@ function criarMensagem(mensagem) {
     messageCol.appendChild(messageAlert);
     messageCol.appendChild(messageDt);
     message.appendChild(messageCol);
-    console.log(message);
-    console.log(innerChatId);
     document.getElementById(innerChatId).appendChild(message);
     objDiv.scrollTop = objDiv.scrollHeight;
+    console.log("Criou mensagem com sucesso!");
 }
 
 connection.start().then(function () {
@@ -164,7 +162,6 @@ connection.start().then(function () {
     if (pedido != null) {
         pedido.addEventListener("submit", function (event) {
             event.preventDefault();
-            console.log("1");
             connection.invoke("enviarPedidoAmizade", origem, destino).catch(function (err) {
                 return console.error(err.toString());
             });

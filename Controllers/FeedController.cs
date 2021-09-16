@@ -29,8 +29,6 @@ namespace BlueBook.Controllers
             List<Usuario> usuarios = await userManager.Users.Include(u => u.Mensagens).ToListAsync();
             List<Amizade> amizades = context.Amizade.Where(a => a.AlvoId == usuarioAtual.Id || a.OrigemId == usuarioAtual.Id).ToList();
             List<IdentityUser> amigos = new List<IdentityUser>();
-            List<Mensagem> mensagens = context.Mensagem.Include(u => u.usuario).ToList();
-            List<Likes> likes = context.Likes.ToList();
             if (usuarioAtual.LinkImagem == null)
             {
                 usuarioAtual.LinkImagem = "https://freepikpsd.com/media/2019/10/default-user-profile-image-png-6-Transparent-Images.png";
@@ -46,10 +44,12 @@ namespace BlueBook.Controllers
                 }
             ViewBag.LinkImagem = usuarioAtual.LinkImagem;
             ViewBag.nome = usuarioAtual.UserName;
-            ViewBag.Mensagens = mensagens;
+            ViewBag.Mensagens = context.Mensagem.Include(u => u.usuario).ToList();
             ViewBag.Postagens = context.Postagem.ToList();
+            ViewBag.Comentarios = context.Comentario.ToList();
             ViewBag.linkPerfil = usuarioAtual.Id;
-            ViewBag.Likes = likes;
+            ViewBag.Likes = context.Likes.ToList();
+            ViewBag.LikesComentarios = context.LikesComentarios.ToList();
             return View(amigos);
         }
 
@@ -99,9 +99,8 @@ namespace BlueBook.Controllers
             if (!LikeBtn.Contains("Like") && !LikeBtn.Contains("Deslike")) return RedirectToAction(nameof(Index));
 
             string[] LikeInfo = LikeBtn.Split(":");
-            int ID = int.Parse(LikeInfo[1]);
             string idUsuario = userManager.GetUserId(User);
-            Postagem postLike = context.Postagem.FirstOrDefault(p => p.ID == ID);
+            Postagem postLike = context.Postagem.FirstOrDefault(p => p.ID == int.Parse(LikeInfo[1]));
             Likes like = context.Likes.FirstOrDefault(u => u.UsuarioId == idUsuario && u.PostagemId == postLike.ID);
             if ( like == null) {
                 like = new Likes()
@@ -121,5 +120,62 @@ namespace BlueBook.Controllers
             context.SaveChanges();
             return RedirectToAction(nameof(Index));
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult LikeComment(string LikeBtn)
+        {
+            if (!LikeBtn.Contains("Like") && !LikeBtn.Contains("Deslike")) return RedirectToAction(nameof(Index));
+
+            string[] LikeInfo = LikeBtn.Split(":");
+            string idUsuario = userManager.GetUserId(User);
+            Comentario comentarioLike = context.Comentario.FirstOrDefault(p => p.Id == int.Parse(LikeInfo[1]));
+            LikesComentarios like = context.LikesComentarios.FirstOrDefault(u => u.UsuarioId == idUsuario && u.ComentarioId == comentarioLike.Id);
+            if (like == null)
+            {
+                like = new LikesComentarios()
+                {
+                    UsuarioId = idUsuario,
+                    ComentarioId = comentarioLike.Id,
+                    TipoLike = LikeInfo[0]
+                };
+                comentarioLike.QuantidadeLikes = like.TipoLike == "Like" ? comentarioLike.QuantidadeLikes + 1 : comentarioLike.QuantidadeLikes - 1;
+                context.LikesComentarios.Add(like);
+            }
+            else
+            {
+                comentarioLike.QuantidadeLikes = like.TipoLike == "Like" ? comentarioLike.QuantidadeLikes - 1 : comentarioLike.QuantidadeLikes + 1;
+                context.LikesComentarios.Remove(like);
+            }
+            context.Comentario.Update(comentarioLike);
+            context.SaveChanges();
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Comentar(string TxtComment, string ImgComment, int PostId)
+        {
+            if (TxtComment.Length > 100) return RedirectToAction(nameof(Index));
+
+            Postagem postagemOriginal = context.Postagem.FirstOrDefault(p => p.ID == PostId);
+
+            if (postagemOriginal == null) return RedirectToAction(nameof(Index));
+
+            Comentario comentarioNovo = new Comentario
+            {
+                Texto = TxtComment,
+                ImagemUrl = ImgComment,
+                DataComentado = DateTime.Now,
+                UsuarioIdComentario = userManager.GetUserId(User),
+                PostagemId = postagemOriginal.ID,
+                QuantidadeLikes = 0
+            };
+            context.Comentario.Add(comentarioNovo);
+            context.SaveChanges();
+            return RedirectToAction(nameof(Index));
+        }
+
+
     }
 }

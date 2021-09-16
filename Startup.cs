@@ -64,7 +64,7 @@ namespace BlueBook
                 endpoints.MapHub<FeedHub>("/feedhub");
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                    pattern: "{controller=Feed}/{action=Index}/{id?}");
                 endpoints.MapRazorPages();
             });
         }

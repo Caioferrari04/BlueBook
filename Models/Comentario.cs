@@ -10,6 +10,7 @@ namespace BlueBook.Models
     {
         public int Id { get; set; }
 
+        [Range(3, 100, ErrorMessage = "Comentário deve ter no minimo 1 caracter e no máximo 100!")]
         public string Texto { get; set; }
 
         public string ImagemUrl { get; set; }
@@ -25,7 +26,5 @@ namespace BlueBook.Models
         public int PostagemId { get; set; }
 
         public Postagem PostagemOriginal { get; set; }
-
-        public List<ComentarioDeComentario> SubComentarios { get; set; }
     }
 }

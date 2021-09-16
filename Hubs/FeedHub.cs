@@ -117,9 +117,8 @@ namespace BlueBook.Hubs
             await Clients.Users(usuarios).SendAsync("RecusarPedido", usuarioDestino.UserName);
         }
 
-        /*Feito para carregar mensagens em caso do usuário receber uma mensagem enquanto está com o chat geral ou privado fechado*/
-        /*Eu odeio isso, isso é feio, isso provavelmente é muito mau-otimizado, mas funciona.*/
-        public async Task CarregarMensagensEnviadas(string origem, List<Mensagem> mensagensCarregadas, string destino = null)
+        /*Feito para carregar mensagens em caso do usuário receber uma mensagem enquanto está com o chat privado fechado*/
+        public async Task CarregarMensagensEnviadas(string origem, Mensagem MensagemRecente, string destino)
         {
             if (origem != Context.UserIdentifier) return;
 
@@ -140,17 +139,8 @@ namespace BlueBook.Hubs
                                 }
                             };
             var mensagemPreRetorno = await mensagens.ToListAsync();
-            List<Mensagem> mensagemRetorno = new List<Mensagem>();
-            List<Mensagem> mensagensParaRemover = new List<Mensagem>();
-            foreach(Mensagem mensagem in mensagemPreRetorno)
-                foreach(Mensagem mensagemCarregada in mensagensCarregadas)
-                    if(mensagemCarregada.ID == mensagem.ID) {
-                        mensagensParaRemover.Add(mensagem);
-                        break;
-                    }
-            for(int i = 0; i < mensagensParaRemover.Count; i++)
-                mensagemPreRetorno.Remove(mensagensParaRemover[i]);
-            mensagemRetorno = mensagemPreRetorno;
+            var mensagemMaisRecenteCompleta = mensagemPreRetorno.Find(m => m.ID == MensagemRecente.ID);
+            List<Mensagem> mensagemRetorno = mensagemPreRetorno.Where(m => m.DataEnvio > mensagemMaisRecenteCompleta.DataEnvio).ToList();
             await Clients.User(origem).SendAsync("CarregarMensagens", mensagemRetorno, destino);
         }
 

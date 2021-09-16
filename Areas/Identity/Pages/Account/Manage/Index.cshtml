@@ -1,5 +1,6 @@
 ﻿@page
-@model IndexModel
+@using BlueBook.Models
+@model Usuario
 @{
     ViewData["Title"] = "Perfil";
     ViewData["ActivePage"] = ManageNavPages.Index;
@@ -10,12 +11,14 @@
     <div class="col-md-6">
         <form id="email-form" asp-controller="User" asp-action="PaginaUsuario">
             <div class="form-group">
-                <label asp-for="Input.LinkImagem"></label>
-                <input name="ImgEdit" class="form-control" placeholder="Link da nova imagem..." />
+                <span class="text-danger" asp-validation-for="LinkImagem"></span>
+                <label asp-for="LinkImagem"></label>
+                <input asp-for="LinkImagem" class="form-control" placeholder="Link da nova imagem..." />
             </div>
             <div class="form-group">
-                <label asp-for="Input.Username"></label>
-                <input name="NameEdit" class="form-control" placeholder="Novo nome..." />
+                <span class="text-danger" asp-validation-for="UserName"></span>
+                <label asp-for="UserName"></label>
+                <input asp-for="UserName" class="form-control" placeholder="Novo nome..." />
             </div>
             <div class="form-group">
                 <button type="submit" class="btn btn-primary" id="editarPerfilFim">Editar</button>

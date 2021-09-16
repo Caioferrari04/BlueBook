@@ -62,12 +62,15 @@ namespace BlueBook.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> PaginaUsuario(string ImgEdit, string NameEdit)
+        public async Task<IActionResult> PaginaUsuario(Usuario usuarioAtualizado)
         {
             Usuario usuarioAtual = await userManager.GetUserAsync(User);
-            usuarioAtual.UserName = NameEdit != null ? NameEdit.Trim() : usuarioAtual.UserName;
-            usuarioAtual.NormalizedUserName = NameEdit != null ? NameEdit.Trim().Normalize() : usuarioAtual.UserName;
-            usuarioAtual.LinkImagem = ImgEdit == null ? "https://freepikpsd.com/media/2019/10/default-user-profile-image-png-6-Transparent-Images.png" : ImgEdit;
+
+            if (!ModelState.IsValid) return View(usuarioAtualizado);
+
+            usuarioAtual.UserName = usuarioAtualizado.UserName != null ? usuarioAtualizado.UserName.Trim() : usuarioAtual.UserName;
+            usuarioAtual.NormalizedUserName = usuarioAtualizado.UserName != null ? usuarioAtualizado.UserName.Trim().ToUpper().Normalize() : usuarioAtual.UserName;
+            usuarioAtual.LinkImagem = usuarioAtualizado.LinkImagem == null ? "https://freepikpsd.com/media/2019/10/default-user-profile-image-png-6-Transparent-Images.png" : usuarioAtualizado.LinkImagem;
             context.Users.Update(usuarioAtual);
             context.SaveChanges();
             /*Foi necessário utilizar um objeto aqui pois utilizar uma string levava o Redirect a identificar a string
