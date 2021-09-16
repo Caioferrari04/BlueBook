@@ -26,30 +26,73 @@ namespace BlueBook.Controllers
         public async Task<IActionResult> Index()
         {
             var usuarioAtual = await userManager.GetUserAsync(User);
-            List<Usuario> usuarios = await userManager.Users.Include(u => u.Mensagens).ToListAsync();
-            List<Amizade> amizades = context.Amizade.Where(a => a.AlvoId == usuarioAtual.Id || a.OrigemId == usuarioAtual.Id).ToList();
             List<IdentityUser> amigos = new List<IdentityUser>();
-            if (usuarioAtual.LinkImagem == null)
-            {
-                usuarioAtual.LinkImagem = "https://freepikpsd.com/media/2019/10/default-user-profile-image-png-6-Transparent-Images.png";
-                context.Users.Update(usuarioAtual);
-                context.SaveChanges();
+            List<Comentario> comentarios = new List<Comentario>();
+            List<Postagem> postagensProcessadas = new List<Postagem>();
+            List<Amizade> amizades = context.Amizade.Include(u => u.Alvo)
+                    .ThenInclude(u => u.Postagens)
+                    .ThenInclude(p => p.Comentarios)
+                    .Include(o => o.Origem)
+                    .ThenInclude(o => o.Postagens)
+                    .ThenInclude(p => p.Comentarios)
+                    .Where(a => a.AlvoId == usuarioAtual.Id || a.OrigemId == usuarioAtual.Id)
+                    .ToList();
+            if (amizades != null) {
+                List<Postagem> postagens = new List<Postagem>();
+                bool postagensUsuarioJaArmazenadas = false;
+                foreach (Amizade amigo in amizades) { 
+                    if (amigo.Alvo.Id == usuarioAtual.Id) {
+                        amigos.Add(amigo.Origem); //Para carregar as informações dos amigos sob demanda, evitando enviar informações confidenciais
+                        postagens.AddRange(amigo.Origem.Postagens);
+                        if (postagensUsuarioJaArmazenadas == false)
+                        {
+                            postagens.AddRange(amigo.Alvo.Postagens);
+                            postagensUsuarioJaArmazenadas = true;
+                        }
+                    }
+                    else if (amigo.Origem.Id == usuarioAtual.Id) { 
+                        amigos.Add(amigo.Alvo);
+                        postagens.AddRange(amigo.Alvo.Postagens);
+                        if (postagensUsuarioJaArmazenadas == false)
+                        {
+                            postagens.AddRange(amigo.Origem.Postagens);
+                            postagensUsuarioJaArmazenadas = true;
+                        }
+                    }
+                }
+                foreach (Postagem postagem in postagens)
+                {
+                    Postagem postagemProcessada = new Postagem()
+                    {
+                        ID = postagem.ID,
+                        UsuarioIdPost = postagem.UsuarioIdPost,
+                        UsuarioPost = new Usuario
+                        {
+                            UserName = postagem.UsuarioPost.UserName,
+                            LinkImagem = postagem.UsuarioPost.LinkImagem
+                        },
+                        DataPostagem = postagem.DataPostagem,
+                        QuantidadeLikes = postagem.QuantidadeLikes,
+                        Texto = postagem.Texto,
+                        UrlImagem = postagem.UrlImagem,
+                        Comentarios = postagem.Comentarios
+                    };
+                    comentarios.AddRange(postagemProcessada.Comentarios);
+                    postagensProcessadas.Add(postagemProcessada);
+                }
             }
-            foreach (Amizade amigo in amizades)
-                if (amigo.AlvoId == usuarioAtual.Id) { 
-                    amigos.Add(amigo.Alvo);
-                }
-                else if (amigo.OrigemId == usuarioAtual.Id) { 
-                    amigos.Add(amigo.Origem);
-                }
+            else {
+                postagensProcessadas = context.Postagem.Include(c => c.Comentarios).Where(u => u.UsuarioIdPost == usuarioAtual.Id).ToList();
+                foreach (Postagem postagem in postagensProcessadas)
+                    comentarios.AddRange(postagem.Comentarios);
+            }
             ViewBag.LinkImagem = usuarioAtual.LinkImagem;
             ViewBag.nome = usuarioAtual.UserName;
-            ViewBag.Mensagens = context.Mensagem.Include(u => u.usuario).ToList();
-            ViewBag.Postagens = context.Postagem.ToList();
-            ViewBag.Comentarios = context.Comentario.ToList();
+            ViewBag.Postagens = postagensProcessadas;
             ViewBag.linkPerfil = usuarioAtual.Id;
-            ViewBag.Likes = context.Likes.ToList();
-            ViewBag.LikesComentarios = context.LikesComentarios.ToList();
+            ViewBag.Mensagens = context.Mensagem.Include(u => u.usuario).ToList();
+            ViewBag.Likes = context.Likes.Include(l => l.PostagemLikada).Where(l => postagensProcessadas.Contains(l.PostagemLikada)).ToList();
+            ViewBag.LikesComentarios = context.LikesComentarios.Include(lc => lc.ComentarioCurtido).Where(lc => comentarios.Contains(lc.ComentarioCurtido)).ToList();
             return View(amigos);
         }
 

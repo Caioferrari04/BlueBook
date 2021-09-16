@@ -141,6 +141,7 @@ namespace BlueBook.Hubs
             var mensagemPreRetorno = await mensagens.ToListAsync();
             var mensagemMaisRecenteCompleta = mensagemPreRetorno.Find(m => m.ID == MensagemRecente.ID);
             List<Mensagem> mensagemRetorno = mensagemPreRetorno.Where(m => m.DataEnvio > mensagemMaisRecenteCompleta.DataEnvio).ToList();
+            mensagemRetorno = mensagemRetorno.Where(m => m.AlvoId == destino || m.UsuarioID == destino).ToList();
             await Clients.User(origem).SendAsync("CarregarMensagens", mensagemRetorno, destino);
         }
 
@@ -174,6 +175,7 @@ namespace BlueBook.Hubs
             string group = usuarios[0] + usuarios[1];
 
             await Clients.Group(group).SendAsync("ReceberMensagemPrivada", retorno, usuarioDestino.Id);
+            await Clients.User(usuarioDestino.Id).SendAsync("NotificacaoMensagemNova", usuarioOrigem.Id);
         }
 
         public Task EntrarGrupo(string destino)

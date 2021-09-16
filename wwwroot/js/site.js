@@ -114,7 +114,7 @@ function criarMensagem(mensagem) {
 
     var messageUser = document.createElement("small");
     messageUser.className = "text-dark";
-    messageUser.textContent = mensagem.nomeUsuario;
+    messageUser.textContent = " " + mensagem.nomeUsuario + " ";
 
     var messageAlert = document.createElement("div");
     messageAlert.classList = "alert mb-0 " + alert;
@@ -132,7 +132,7 @@ function criarMensagem(mensagem) {
     messageLink.appendChild(messageImg);
     messageLink.appendChild(messageUser);
     messageCol.appendChild(messageAlert);
-    messageCol.appendChild(messageDt);
+    messageLink.appendChild(messageDt);
     message.appendChild(messageCol);
     document.getElementById(innerChatId).appendChild(message);
     objDiv.scrollTop = objDiv.scrollHeight;

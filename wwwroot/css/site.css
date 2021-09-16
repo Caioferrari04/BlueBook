@@ -132,11 +132,15 @@ body {
     background-color: white;
 }
 
-.chat::-webkit-scrollbar, .lista-amigos::-webkit-scrollbar, .container-main::-webkit-scrollbar, .comentarioCaixa::-webkit-scrollbar {
+.chat::-webkit-scrollbar, .lista-amigos::-webkit-scrollbar {
     width: 2px;
 }
 
-.chat::-webkit-scrollbar-thumb, .lista-amigos::-webkit-scrollbar-thumb, .container-main::-webkit-scrollbar-thumb, .comentarioCaixa::-webkit-scrollbar-thumb {
+.comentarioCaixa::-webkit-scrollbar, .comentarioCaixa::-webkit-scrollbar-thumb, .container-main::-webkit-scrollbar, .container-main::-webkit-scrollbar-thumb {
+    width: 0px;
+}
+
+.chat::-webkit-scrollbar-thumb, .lista-amigos::-webkit-scrollbar-thumb {
     box-shadow: inset 0 0 6px rgba(0,0,0,.3);
     background-color: silver;
 }
@@ -171,11 +175,11 @@ body {
     justify-content: center;
     align-items: center;
     box-shadow: rgba(0, 0, 0, 0.4) 0px 2px 4px, rgba(0, 0, 0, 0.3) 0px 7px 13px -3px, rgba(0, 0, 0, 0.2) 0px -3px 0px inset;
-    position: absolute;
+    position: relative;
     left: 50%;
     bottom: 50%;
-    width: 30vh;
-    height: 30vh;
+    width: 300px;
+    height: 300px;
     z-index: 5;
     background-color: white;
     padding: 3vh;
@@ -239,13 +243,18 @@ body {
 .botao-like {
     border: 0;
     background-color: transparent;
+    transition: 0.2s ease;
 }
 
-.botao-like:active, .botao-like:focus {
+.botao-like:active {
     border: 0;
     background-color: lightgray;
     transition: 0.6s;
     border-radius: 20vh;
+    outline: 0;
+}
+
+.botao-like:focus {
     outline: 0;
 }
 

@@ -35,7 +35,8 @@ namespace BlueBook.Controllers
                 if (ViewBag.AmigoOuNao == null) ViewBag.AmigoOuNao = false;
                 return usuario != null ? View(usuario) : RedirectToAction(nameof(NotFound));
             }
-            return RedirectToAction(nameof(PaginaUsuario), Id);
+            RouteValues idPagina = new RouteValues() { Id = usuario.Id };
+            return RedirectToAction(nameof(PaginaUsuario), idPagina);
         }
 
         public new IActionResult NotFound() => View();
@@ -77,6 +78,15 @@ namespace BlueBook.Controllers
              como um controller.*/
             RouteValues IdPagina = new RouteValues() { Id = usuarioAtual.Id };
             return RedirectToAction(nameof(PaginaUsuario), IdPagina);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> PesquisarUsuario(string NomeUsuario)
+        {
+            Usuario usuario = await userManager.FindByNameAsync(NomeUsuario);
+            RouteValues idPagina = new RouteValues() { Id = usuario.Id };
+            return usuario != null ? RedirectToAction(nameof(Index), idPagina) : RedirectToAction(nameof(NotFound));
         }
     }
 

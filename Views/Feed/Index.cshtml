@@ -4,43 +4,39 @@
     ViewData["Title"] = "Seu Feed";
     var mensagens = ViewBag.Mensagens as List<Mensagem>;
     var nomeUsuario = ViewBag.nome as string;
-    var linkImagemUsuario = ViewBag.LinkImagem as string;
     var Postagens = ViewBag.Postagens as List<Postagem>;
-    var linkPerfil = $"/User/Index/{ViewBag.linkPerfil}" as string;
     var likes = ViewBag.Likes as List<Likes>;
-    var comentarios = ViewBag.Comentarios as List<Comentario>;
     var mensagemRecente = mensagens.Last();
     var likesComentarios = ViewBag.LikesComentarios as List<LikesComentarios>;
 }
 
-
-<div class="container-feed">
-    <main role="main" class="pb-3 container-main">
-        <div id="feed">
-            <div class="card mb-3">
-                <form class="card-body" asp-action="Postar">
-                    <div class="mb-3">
-                        <label for="InputPost" class="form-label">Postar</label>
-                        <textarea class="form-control" id="InputPost" rows="5" name="TxtPost" placeholder="O que você está pensando?"></textarea>
-                        <label for="InputPost" class="form-label">Link da imagem (Opcional)</label>
-                        <input class="form-control" name="ImgPost" placeholder="Link da imagem aqui..." />
-                    </div>
-                    <button type="submit" class="btn btn-info">Postar</button>
-                </form>
-            </div>
-            @if (Postagens != null)
-            {
-                @foreach (Postagem postagem in Postagens)
+    <div class="container-feed">
+        <main role="main" class="pb-3 container-main">
+            <div id="feed">
+                <div class="card mb-3">
+                    <form class="card-body" asp-action="Postar">
+                        <div class="mb-3">
+                            <label for="InputPost" class="form-label">Postar</label>
+                            <textarea class="form-control" id="InputPost" rows="5" name="TxtPost" placeholder="O que você está pensando?"></textarea>
+                            <label for="InputPost" class="form-label">Link da imagem (Opcional)</label>
+                            <input class="form-control" name="ImgPost" placeholder="Link da imagem aqui..." />
+                        </div>
+                        <button type="submit" class="btn btn-info">Postar</button>
+                    </form>
+                </div>
+                @if (Postagens != null)
                 {
-                    if (Model.Contains(postagem.UsuarioPost) || postagem.UsuarioIdPost == ViewBag.linkPerfil) {
+                    @foreach (Postagem postagem in Postagens)
+                    {
+                        var colorPost = postagem.QuantidadeLikes > 0 ? "text-success" : "text-danger";
                         var like = likes.FirstOrDefault(l => l.PostagemId == postagem.ID && l.UsuarioId == ViewBag.linkPerfil);
                         <div class="card mb-3">
                             <div class="card-body">
-                                <h5 class="card-title">@postagem.UsuarioPost.UserName <small class="text-muted">@postagem.DataPostagem</small></h5>
+                                <h5 class="card-title"><img src="@postagem.UsuarioPost.LinkImagem" class="usuario-imagem"/>@postagem.UsuarioPost.UserName <small class="text-muted">@postagem.DataPostagem</small></h5>
                                 <p class="card-text">@postagem.Texto</p>
                                 <p class="card-text"></p>
                                 <form asp-action="LikePost">
-                                    @postagem.QuantidadeLikes
+                                    <span class="@colorPost">@postagem.QuantidadeLikes</span>
                                     @if (like != null && like.TipoLike == "Like")
                                     {
                                         <button type="submit" value="Like:@postagem.ID" name="LikeBtn" class="botao-like">
@@ -90,10 +86,12 @@
                             }
                             <div class="bg-light rounded-bottom pl-3 pr-3 comentarioPost" id="comentarioPost-@postagem.ID">
                                 <div class="comentarioCaixa">
-                                    @foreach (Comentario comentario in comentarios)
+                                    @foreach (Comentario comentario in postagem.Comentarios)
                                     {
-                                        @if(comentario.PostagemId == postagem.ID) {
+                                        @if (comentario.PostagemId == postagem.ID)
+                                        {
                                             var likeComentario = likesComentarios.FirstOrDefault(l => l.ComentarioId == comentario.Id && l.UsuarioId == ViewBag.linkPerfil);
+                                            var color = comentario.QuantidadeLikes > 0 ? "text-success" : "text-danger";
                                             var alert = ViewBag.linkPerfil == comentario.UsuarioIdComentario ? "alert-light" : "alert-dark";
                                             <div class="row">
                                                 <div class="col-md-12 text-left">
@@ -105,7 +103,7 @@
                                                         <span class="d-block">@comentario.Texto</span>
                                                     </div>
                                                     <div class="ml-4 mb-3 d-flex row">
-                                                        @comentario.DataComentado.ToString("dd/MM HH:mm") | @comentario.QuantidadeLikes
+                                                        @comentario.DataComentado.ToString("dd/MM HH:mm") | <span class="@color">@comentario.QuantidadeLikes</span>
                                                         <form asp-action="LikeComment">
                                                             @if (likeComentario != null && likeComentario.TipoLike == "Like")
                                                             {
@@ -159,10 +157,9 @@
                         </div>
                     }
                 }
-            }
-        </div>
-    </main>
-</div>
+            </div>
+        </main>
+    </div>
 @{
     #region Chat geral
 
@@ -187,11 +184,11 @@
                                     <a asp-controller="User" asp-action="Index" asp-route-id="@mensagem.UsuarioID">
                                         <img src="@mensagem.usuario.LinkImagem" class="usuario-imagem @position" />
                                         <small class="text-dark">@mensagem.NomeUsuario</small>
+                                        <small class="text-info">@mensagem.DataEnvio.ToString("dd/MM HH:mm")</small>
                                     </a>
                                     <div class="alert mb-0 @alert" role="alert">
                                         <span class="d-block">@mensagem.Texto</span>
                                     </div>
-                                    <small class="text-info">@mensagem.DataEnvio.ToString("dd/MM HH:mm")</small>
                                 </div>
                             </div>
                         }
@@ -225,7 +222,7 @@
                     <li id="abrirPrivado-@amigo.Id" class="list-group-item d-flex justify-content-between align-items-center abrir-chat">
                         <div>
                             <img src="@amigo.LinkImagem" class="usuario-imagem" />
-                            @amigo.
+                            @amigo.UserName
                         </div>
                     </li>
 
@@ -263,11 +260,11 @@
                                         <a asp-controller="User" asp-action="Index" asp-route-id="@mensagem.UsuarioID">
                                             <img src="@mensagem.usuario.LinkImagem" class="usuario-imagem @position" />
                                             <small class="text-dark">@mensagem.NomeUsuario</small>
+                                            <small class="text-info">@mensagem.DataEnvio.ToString("dd/MM HH:mm")</small>
                                         </a>
                                         <div class="alert mb-0 @alert" role="alert">
                                             <span class="d-block">@mensagem.Texto</span>
                                         </div>
-                                        <small class="text-info">@mensagem.DataEnvio.ToString("dd/MM HH:mm")</small>
                                     </div>
                                 </div>
                             }
@@ -292,16 +289,14 @@
 {
     <script>
         var nomeUsuario = "@nomeUsuario";
-        var linkImagemUsuario = "@linkImagemUsuario";
-        var linkPerfil = "@linkPerfil";
         var idAtual = "@ViewBag.linkPerfil";
         var objDiv = document.getElementById("chatMain");
+        objDiv.scrollTop = objDiv.scrollHeight;
         var mensagemMaisRecente = {
             ID: @mensagemRecente.ID,
             UsuarioID: "@mensagemRecente.UsuarioID",
             AlvoId: "@mensagemRecente.AlvoId"
         };
-        objDiv.scrollTop = objDiv.scrollHeight;
 
         /*Construir e estilizar mensagens novas enviadas por websocket*/
         function formatDate(dateString) {
@@ -338,12 +333,38 @@
                     UsuarioID: mensagens[mensagens.length-1].usuarioID,
                     AlvoId: mensagens[mensagens.length-1].alvoId
                 };
+                console.log(mensagemMaisRecente);
             }
             if (mensagens != null) {
                 mensagens.forEach(criarMensagem);
             }
             var objDivPriv = document.getElementById("chatMain-" + destino);
             objDivPriv.scrollTop = objDivPriv.scrollHeight;
+        });
+        var notificaoCriada = "";
+        connection.on("NotificacaoMensagemNova", (origem) => {
+            console.log("recebeuNotificacao");
+
+            if (notificaoCriada != origem) {
+                var chatMensagem = document.getElementById("abrirPrivado-" + origem);
+                console.log(chatMensagem);
+                console.log("achouChat");
+
+                var notificacao = document.createElement("img");
+                notificacao.src = "https://cdn-icons-png.flaticon.com/512/60/60765.png"
+                notificacao.setAttribute("width", "16");
+                notificacao.setAttribute("height", "16");
+                console.log("criouClassList", notificacao);
+
+                chatMensagem.appendChild(notificacao);
+                console.log("realizouAppend");
+
+                notificaoCriada = origem;
+                chatMensagem.addEventListener("click", () => {
+                    notificacao.remove();
+                    notificaoCriada = "";
+                })
+            }
         });
 
         function CarregarChat(destino, destino_user) {
@@ -400,7 +421,7 @@
     {
         @for (int i = 0; i < Model.Count; i++)
         {
-        <script>
+            <script>
             document.getElementById("abrirPrivado-@Model[i].Id").addEventListener("click", function (event) {
                 event.preventDefault();
                 if (ja_carregado != "@Model[i].Id") {
@@ -425,32 +446,31 @@
             window.addEventListener("unload", function () {
                 connection.invoke("SairGrupo", "@Model[i].UserName");
             });
-        </script>
+            </script>
         }
     }
-    
-@foreach(Postagem postagem in Postagens)
-{
-<script>
-    var botaoComentario = document.getElementById("abrirComment-@postagem.ID");
-    var clicou = document.getElementById("clicou-@postagem.ID");
-    var naoClicou = document.getElementById("naoClicou-@postagem.ID");
-    botaoComentario.addEventListener("click", (event) => {
-        event.preventDefault();
-        var comentario = document.getElementById("comentarioPost-@postagem.ID");
-        if (comentario.style.display == "block") {
-            comentario.style.display = "none";
-            naoClicou.style.display = "block";
-            clicou.style.display = "none";
-        }
-        else {
-            comentario.style.display = "block";
-            naoClicou.style.display = "none";
-            clicou.style.display = "block";
-        }
-    });
-</script>
-}
+
+    @foreach (Postagem postagem in Postagens)
+    {
+    <script>
+        var botaoComentario = document.getElementById("abrirComment-@postagem.ID");
+        botaoComentario.addEventListener("click", () => {
+            var comentario = document.getElementById("comentarioPost-@postagem.ID");
+            var clicou = document.getElementById("clicou-@postagem.ID");
+            var naoClicou = document.getElementById("naoClicou-@postagem.ID");
+            if (comentario.style.display == "block") {
+                comentario.style.display = "none";
+                naoClicou.style.display = "inline-block";
+                clicou.style.display = "none";
+            }
+            else {
+                comentario.style.display = "block";
+                naoClicou.style.display = "none";
+                clicou.style.display = "inline-block";
+            }
+        });
+    </script>
+    }
 
     <!-- Minimizar chat geral -->
     <script>
