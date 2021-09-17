@@ -90,7 +90,9 @@ namespace BlueBook.Controllers
             ViewBag.nome = usuarioAtual.UserName;
             ViewBag.Postagens = postagensProcessadas;
             ViewBag.linkPerfil = usuarioAtual.Id;
-            ViewBag.Mensagens = context.Mensagem.Include(u => u.usuario).ToList();
+            List<Mensagem> mensagens = context.Mensagem.Include(u => u.usuario).ToList();
+            ViewBag.Mensagens = mensagens;
+            ViewBag.MensagemRecente = mensagens.Count == 0 ? null : mensagens.Last();
             ViewBag.Likes = context.Likes.Include(l => l.PostagemLikada).Where(l => postagensProcessadas.Contains(l.PostagemLikada)).ToList();
             ViewBag.LikesComentarios = context.LikesComentarios.Include(lc => lc.ComentarioCurtido).Where(lc => comentarios.Contains(lc.ComentarioCurtido)).ToList();
             return View(amigos);
