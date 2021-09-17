@@ -29,6 +29,7 @@ namespace BlueBook.Controllers
             List<IdentityUser> amigos = new List<IdentityUser>();
             List<Comentario> comentarios = new List<Comentario>();
             List<Postagem> postagensProcessadas = new List<Postagem>();
+            //Feito para diminuir a quantidade de consultas no código, melhorando a perfomance e segurança
             List<Amizade> amizades = context.Amizade.Include(u => u.Alvo)
                     .ThenInclude(u => u.Postagens)
                     .ThenInclude(p => p.Comentarios)
@@ -42,7 +43,7 @@ namespace BlueBook.Controllers
                 bool postagensUsuarioJaArmazenadas = false;
                 foreach (Amizade amigo in amizades) { 
                     if (amigo.Alvo.Id == usuarioAtual.Id) {
-                        amigos.Add(amigo.Origem); //Para carregar as informações dos amigos sob demanda, evitando enviar informações confidenciais
+                        amigos.Add(amigo.Origem);
                         postagens.AddRange(amigo.Origem.Postagens);
                         if (postagensUsuarioJaArmazenadas == false)
                         {
