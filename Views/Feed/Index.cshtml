@@ -32,7 +32,13 @@
                     var like = likes.FirstOrDefault(l => l.PostagemId == postagem.ID && l.UsuarioId == ViewBag.linkPerfil);
                     <div class="card mb-3">
                         <div class="card-body">
-                            <h5 class="card-title"><img src="@postagem.UsuarioPost.LinkImagem" class="usuario-imagem" />@postagem.UsuarioPost.UserName <small class="text-muted">@postagem.DataPostagem</small></h5>
+                            <h5 class="card-title">
+                                <a asp-controller="User" asp-action="Index" asp-route-id="@postagem.UsuarioIdPost">
+                                    <img src="@postagem.UsuarioPost.LinkImagem" class="usuario-imagem" />
+                                    @postagem.UsuarioPost.UserName 
+                                </a>
+                                <small class="text-muted">@postagem.DataPostagem</small>
+                            </h5>
                             <p class="card-text">@postagem.Texto</p>
                             <p class="card-text"></p>
                             <form asp-action="LikePost">
@@ -183,7 +189,7 @@
                                 <div class="col-md-12 @position">
                                     <a asp-controller="User" asp-action="Index" asp-route-id="@mensagem.UsuarioID">
                                         <img src="@mensagem.usuario.LinkImagem" class="usuario-imagem @position" />
-                                        <small class="text-dark">@mensagem.NomeUsuario</small>
+                                        <small class="text-dark">@mensagem.usuario.UserName</small>
                                         <small class="text-info">@mensagem.DataEnvio.ToString("dd/MM HH:mm")</small>
                                     </a>
                                     <div class="alert mb-0 @alert" role="alert">

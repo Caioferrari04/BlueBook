@@ -55,18 +55,17 @@ connection.on("PedidoAmizade", (idOrigem, idDestino, nomeUsuario) => {
     botaoAceitar.addEventListener("click", function (event) {
         event.preventDefault();
         console.log("2");
+        $('.modal').modal('hide').data('bs.modal', null);
         connection.invoke("aceitarPedidoAmizade", origem, destino).catch(function (err) {
             return console.error(err.toString());
         });
-        $('#pedidoAmizade').remove();
-        $('.modal-backdrop').remove();
     });
     botaoRecusar.addEventListener("click", function (event) {
         event.preventDefault();
+        $('.modal').modal('hide').data('bs.modal', null);
         connection.invoke("recusarPedidoAmizade", origem, destino).catch(function (err) {
             return console.error(err.toString());
         });
-        $('.modal').modal('hide').data('bs.modal', null);
     });
 });
 
@@ -95,9 +94,9 @@ connection.on("AceitarPedido", (destino) => {
     areaBotoes.className = "modal-footer";
 
     var botaoOk = document.createElement("button");
-    botaoAceitar.classList = "btn btn-primary btn-info";
-    botaoAceitar.textContent = "Ok";
-    botaoAceitar.setAttribute("data-bs-dismiss", "modal");
+    botaoOk.classList = "btn btn-primary btn-info";
+    botaoOk.textContent = "Ok";
+    botaoOk.setAttribute("data-bs-dismiss", "modal");
     console.log("chegou aqui");
     modalContent.appendChild(modalBody);
     areaBotoes.appendChild(botaoOk);

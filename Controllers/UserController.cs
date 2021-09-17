@@ -85,7 +85,7 @@ namespace BlueBook.Controllers
         public async Task<IActionResult> PesquisarUsuario(string NomeUsuario)
         {
             Usuario usuario = await userManager.FindByNameAsync(NomeUsuario);
-            RouteValues idPagina = new RouteValues() { Id = usuario.Id };
+            RouteValues idPagina = usuario == null ? null : new RouteValues() { Id = usuario.Id };
             return usuario != null ? RedirectToAction(nameof(Index), idPagina) : RedirectToAction(nameof(NotFound));
         }
     }

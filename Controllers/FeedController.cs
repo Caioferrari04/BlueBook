@@ -37,7 +37,7 @@ namespace BlueBook.Controllers
                     .ThenInclude(p => p.Comentarios)
                     .Where(a => a.AlvoId == usuarioAtual.Id || a.OrigemId == usuarioAtual.Id)
                     .ToList();
-            if (amizades != null) {
+            if (amizades.Count > 0) {
                 List<Postagem> postagens = new List<Postagem>();
                 bool postagensUsuarioJaArmazenadas = false;
                 foreach (Amizade amigo in amizades) { 
@@ -60,7 +60,7 @@ namespace BlueBook.Controllers
                         }
                     }
                 }
-                foreach (Postagem postagem in postagens)
+                foreach (Postagem postagem in postagens.OrderBy(p => p.DataPostagem))
                 {
                     Postagem postagemProcessada = new Postagem()
                     {
